@@ -1,0 +1,36 @@
+<!--
+  @Description:
+  @Author: George
+  @Date: 2020/3/23 11:09 PM
+-->
+<template>
+  <ul>
+    <Item v-for="(item, index) in data" :key="index" :data="item" @show-paper="showPaper"/>
+  </ul>
+</template>
+
+<script>
+import Item from './Item'
+
+export default {
+  name: 'ListView',
+  components: {
+    Item
+  },
+  props: {
+    data: {
+      type: Array,
+      default: () => []
+    }
+  },
+  methods: {
+    showPaper (id) {
+      this.$emit('show-paper', id)
+    }
+  }
+}
+</script>
+
+<style scoped lang="scss">
+
+</style>
