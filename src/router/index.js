@@ -32,6 +32,11 @@ const routes = [
         path: '/score',
         name: 'Score',
         component: () => import(/* webpackChunkName: "score" */ '../views/Score/index')
+      },
+      {
+        path: '/wrong-question',
+        name: 'WrongQuestion',
+        component: () => import(/* webpackChunkName: "wrong-question" */ '../views/WrongQuestion/index')
       }
     ]
   },

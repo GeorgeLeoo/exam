@@ -21,7 +21,8 @@ export default {
   name: 'header-menu',
   props: {
     data: {
-      type: Array
+      type: Array,
+      default: () => []
     }
   },
   data () {

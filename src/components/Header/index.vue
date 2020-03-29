@@ -11,7 +11,7 @@
           <img class="logo-img" src="./../../assets/logo.png" alt="">
           <h3 class="title">考试通</h3>
         </router-link>
-        <header-menu :data="menuList"/>
+        <header-menu :data="menu"/>
       </div>
       <div class="right">
         <div class="icon-container">
@@ -35,7 +35,6 @@
 <script>
 import { Avatar, Dropdown, DropdownItem, DropdownMenu } from 'element-ui'
 import HeaderMenu from '@/components/HeaderMenu'
-import { menuList } from './settings'
 
 export default {
   name: 'Header',
@@ -46,9 +45,10 @@ export default {
     DropdownMenu,
     HeaderMenu
   },
-  data () {
-    return {
-      menuList
+  props: {
+    menu: {
+      type: Array,
+      default: () => []
     }
   }
 }
