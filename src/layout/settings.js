@@ -1,5 +1,5 @@
 /*
-* @Description:
+* @Description: 菜单配置文件
 * @Author: George
 * @Date: 2020/3/22 5:08 PM
 * */
@@ -23,5 +23,10 @@ export const menuList = [
     icon: 'el-icon-attract',
     text: '成绩',
     path: '/score'
+  },
+  {
+    icon: 'el-icon-attract',
+    text: '错题',
+    path: '/wrong-question'
   }
 ]

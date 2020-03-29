@@ -5,12 +5,13 @@
 -->
 <template>
   <div>
-    <Header />
+    <Header :menu="menuList" />
     <router-view />
   </div>
 </template>
 
 <script>
+import { menuList } from './settings'
 import Header from '@/components/Header'
 
 export default {
@@ -19,7 +20,9 @@ export default {
     Header
   },
   data () {
-    return {}
+    return {
+      menuList
+    }
   }
 }
 </script>

@@ -32,7 +32,8 @@ export default {
 <style scoped lang="scss">
   .examing-head {
     position: relative;
-    height: 180px;
+    height: 260px;
+    overflow-x: hidden;
     /*background: rgba(64, 158, 255, 1);*/
     color: #fff;
     .cover{
@@ -43,7 +44,7 @@ export default {
       width: calc(100% + 200px);
       height: 260px;
       background: rgba(64, 158, 255, 1);
-      border-bottom-left-radius: 30%;
+      border-bottom-left-radius: 40%;
       border-bottom-right-radius: 66%;
     }
 

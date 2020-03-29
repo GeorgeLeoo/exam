@@ -93,7 +93,7 @@ export default {
     user-select: none;
 
     .paper {
-      margin: -48px 54px 0;
+      margin: -128px 54px 0;
       position: relative;
       z-index: 9;
 
