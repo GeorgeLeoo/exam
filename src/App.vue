@@ -33,4 +33,7 @@
     float: right;
     display: inline-block;
   }
+  input {
+    outline: none;
+  }
 </style>

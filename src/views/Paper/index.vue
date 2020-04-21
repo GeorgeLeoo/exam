@@ -9,7 +9,7 @@
           <tab-pane v-for="(item, index) in tabNames" :key="index" :label="item.label" :name="item.name"/>
         </tabs>
         <div class="fr">
-          <el-input v-model="paperName" suffix-icon="el-icon-search" placeholder="试卷搜索" @change="handleSearch"/>
+          <el-input v-model="paperName" suffix-icon="el-icon-search" placeholder="试卷搜索" @input="handleSearch"/>
         </div>
       </div>
       <list-view v-loading="loading" :is-paper="activeName === tabNames[0].name" :data="listData" @show-paper="startTest"/>
@@ -21,7 +21,8 @@
 import { Tabs, TabPane, Input } from 'element-ui'
 import ListView from '../Paper/ListView'
 import SideMenu from '@/components/SideMenu'
-import { getSubjects, getPapers, getKnowledgePoint } from '../../api/paper'
+import { getPapers, getKnowledgePoint } from '../../api/paper'
+import { getSubjects } from '../../api/subject'
 const tabNames = [{
   label: '试卷',
   name: 'paper'
@@ -60,7 +61,7 @@ export default {
        * 搜索
        */
     handleSearch () {
-      console.log(11)
+      this.getPapers()
     },
     /**
        * 根据科目查询信息
@@ -108,8 +109,9 @@ export default {
       const params = {
         limit: 10,
         page: 1,
-        _id: this.id
+        subject: this.id
       }
+      this.paperName && (params.paperName = this.paperName)
       this.loading = true
       const res = await getPapers(params)
       this.listData = res.data.list
