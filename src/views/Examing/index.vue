@@ -4,7 +4,12 @@
   @Date: 2020/3/28 8:44 PM
 -->
 <template>
-  <div class="examing">
+  <div
+    v-loading="loadingPaper"
+    element-loading-text="正在生成试卷中"
+    element-loading-spinner="el-icon-loading"
+    class="examing"
+  >
     <examing-head :data="examHeadData"/>
     <div class="paper">
       <div class="item menu fl">
@@ -26,7 +31,7 @@
         </div>
         <div class="divider"></div>
         <div class="submit-paper-wrapper">
-          <el-button type="primary">我要交卷</el-button>
+          <el-button type="primary" @click="handleSubmitPaper">我要交卷</el-button>
         </div>
       </div>
       <div class="item content fl">
@@ -43,11 +48,32 @@
         </div>
       </div>
     </div>
+    <el-dialog
+      title="警告"
+      :visible.sync="dialogVisible"
+      width="30%">
+      <span>您刚才离开过考试了，还有{{ times }}次机会了</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      title="强制交卷"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      :visible.sync="forceSubmitDialogVisible"
+      width="30%">
+      <span>由于您离开了3次，现在强制交卷，有异议联系管理员</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="forceSubmitPaper">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { Button } from 'element-ui'
+import { Button, Dialog, MessageBox } from 'element-ui'
 import ExamingHead from '@/components/ExamingHead'
 import QCheckBoxGroup from '@/components/QCheckBoxGroup'
 import CheckBoxGroup from '@/components/CheckBoxGroup'
@@ -58,10 +84,16 @@ export default {
     ExamingHead,
     QCheckBoxGroup,
     CheckBoxGroup,
-    ElButton: Button
+    ElButton: Button,
+    ElDialog: Dialog
   },
   data () {
     return {
+      loadingPaper: true,
+      times: 3,
+      maxTime: 3,
+      dialogVisible: false,
+      forceSubmitDialogVisible: false,
       finishedList: [1, 2, 3, 7, 9, 16, 20],
       examHeadData: {},
       qCheckBoxList: [
@@ -80,7 +112,66 @@ export default {
       ]
     }
   },
+  mounted () {
+    this.forbid()
+    this.listeningPage()
+    this.getPaperQuestion()
+  },
   methods: {
+    forbid () {
+      document.oncontextmenu = () => { return false }
+    },
+    getPaperQuestion () {
+      this.loadingPaper = true
+      setTimeout(() => {
+        this.loadingPaper = false
+      }, 3000)
+    },
+    /**
+       * 监听刘页面事件
+       */
+    listeningPage () {
+      // 监听页面显示与隐藏
+      // document.addEventListener('visibilitychange', () => {
+      //   const isHidden = document.hidden
+      //   if (isHidden) {
+      //     this.dialogVisible = true
+      //     this.times--
+      //     this.times === 0 && this.showForceSubmitDialog()
+      //   }
+      // })
+      // 监听浏览器失去焦点
+      window.addEventListener('blur', () => {
+        this.dialogVisible = true
+        this.times--
+        this.times === 0 && this.showForceSubmitDialog()
+      })
+    },
+    showForceSubmitDialog () {
+      this.forceSubmitDialogVisible = true
+    },
+    /**
+       * 强制交卷
+       */
+    forceSubmitPaper () {
+      this.$router.back()
+    },
+    /**
+       * 提交试卷
+       */
+    handleSubmitPaper () {
+      MessageBox.confirm(
+        '一旦交卷就不能在作答或修改答案',
+        '确认交卷？',
+        {
+          confirmButtonText: '确定提交',
+          cancelButtonText: '继续答题',
+          type: 'warning'
+        }
+      ).then(() => {
+        this.$router.back()
+      })
+    },
     handleSelected (val) {
       console.log(val)
     }
@@ -91,6 +182,7 @@ export default {
 <style scoped lang="scss">
   .examing {
     user-select: none;
+    height: 100vh;
 
     .paper {
       margin: -128px 54px 0;
@@ -161,18 +253,22 @@ export default {
       .menu {
         width: 360px;
         margin-right: 32px;
+
         .checkbox-wrapper {
           height: calc(100vh - 390px);
           overflow: auto;
         }
-        .divider{
+
+        .divider {
           height: 32px;
           border-bottom: 1px solid #EBEEF5;
         }
-        .submit-paper-wrapper{
+
+        .submit-paper-wrapper {
           text-align: center;
           padding: 32px;
-          .el-button{
+
+          .el-button {
             width: 200px;
           }
         }

@@ -34,8 +34,8 @@ export default {
     }
   },
   mounted () {
-    this.getHotSubjects()
-    this.getHotPapers()
+    // this.getHotSubjects()
+    // this.getHotPapers()
   },
   methods: {
     startTest () {},
