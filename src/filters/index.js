@@ -49,3 +49,15 @@ export const paperTypeFilter = (type) => {
   }
   return statusMap[type]
 }
+
+export const timeFilter = (time) => {
+  return Number(time) < 10 ? '0' + time : time
+}
+
+export const trueOrFalseFilter = (type) => {
+  const statusMap = {
+    0: '正确',
+    1: '错误'
+  }
+  return statusMap[type]
+}

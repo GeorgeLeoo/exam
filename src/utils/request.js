@@ -1,8 +1,9 @@
 import axios from 'axios'
 import { MessageBox } from 'element-ui'
-// import { UserModule } from '@/store/modules/user'
 import { responseCode } from '@/config'
 import uiutils from '@/uiutils'
+import store from '@/store'
+import router from '@/router'
 
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
@@ -14,9 +15,10 @@ const service = axios.create({
 service.interceptors.request.use(
   (config) => {
     // Add X-Access-Token header to every request, you can add other custom headers here
-    // if (UserModule.token) {
-    //   config.headers['X-Access-Token'] = UserModule.token
-    // }
+    const token = store.getters.getToken
+    if (token) {
+      config.headers['X-Access-Token'] = 'bearer ' + token
+    }
     return config
   },
   (error) => {
@@ -61,7 +63,12 @@ service.interceptors.response.use(
     }
   },
   (error) => {
+    console.log(error)
     uiutils.Message.error(error.response.data.msg)
+    if (error.response.status === responseCode.UN_AUTHORIZATION) {
+      store.dispatch('RestToken')
+      router.replace({ path: '/sign-in' })
+    }
     return Promise.reject(error)
   }
 )

@@ -8,7 +8,9 @@ import {
   SET_INTRODUCTION,
   SET_NAME,
   SET_ROLES,
-  SET_UID
+  SET_UID,
+  SET_PHONE,
+  SET_USERNAME
 } from './../mutation-types'
 
 export default {
@@ -27,11 +29,16 @@ export default {
   [SET_NAME] (state, { name }) {
     state.user.name = name
   },
+  [SET_PHONE] (state, { phone }) {
+    state.user.phone = phone
+  },
   [SET_ROLES] (state, { roles }) {
     state.user.roles = roles
   },
   [SET_UID] (state, { uid }) {
-    console.log(uid)
     state.user.uid = uid
+  },
+  [SET_USERNAME] (state, { username }) {
+    state.user.username = username
   }
 }

@@ -1,59 +1,62 @@
 <template>
   <section class="paper wrapper1024 clearfix">
-    <article class="fl left">
-      <side-menu :data="subjectList" @load-data="loadData"/>
+    <div class="clearfix">
+      <tabs class="fl paper-tab" v-model="activeName" @tab-click="handleTabChange">
+        <tab-pane v-for="(item, index) in tabNames" :key="index" :label="item.label" :name="item.name"/>
+      </tabs>
+      <div class="fr">
+        <el-input v-model="paperName" suffix-icon="el-icon-search" placeholder="试卷搜索" @input="handleSearch"/>
+      </div>
+    </div>
+    <article v-if="activeName === tabNames[0].name" class="clearfix">
+      <article class="fl left">
+        <side-menu :data="subjectList" @load-data="loadData"/>
+      </article>
+      <list-view v-loading="loading" class="fl list" :is-paper="activeName === tabNames[0].name" :data="listData"
+                 @exam="startTest"/>
+      <div class="pagination">
+        <pagination
+          v-if="total > limit"
+          :total="total"
+          :page.sync="page"
+          :limit.sync="limit"
+          background
+          layout="prev, pager, next"
+          @current-change="getList"
+        />
+      </div>
     </article>
-    <article class="fl gap right">
-      <div class="clearfix">
-        <tabs class="fl paper-tab" v-model="activeName" @tab-click="handleTabChange">
-          <tab-pane v-for="(item, index) in tabNames" :key="index" :label="item.label" :name="item.name"/>
-        </tabs>
-        <div class="fr">
-          <el-input v-model="paperName" suffix-icon="el-icon-search" placeholder="试卷搜索" @input="handleSearch"/>
-        </div>
-      </div>
-      <list-view v-loading="loading" :is-paper="activeName === tabNames[0].name" :data="listData" @exam="startTest"/>
+    <article v-else>
+      <article class="fl left">
+        <side-menu :data="typeList" @load-data="loadDataByType"/>
+      </article>
+      <ul v-loading="loading" class="fl list">
+        <li v-for="(item, index) in knowledgePointList" :key="item._id + index" class="knowledge-point-list">
+          <span>{{ item._id }}（共 {{ item.total }} 题）</span>
+          <el-button class="btn" type="primary" @click="handleToTest(item._id)">开始练习</el-button>
+        </li>
+      </ul>
     </article>
-    <el-dialog
-      title="考生身份信息确认"
-      :visible.sync="dialogVisible"
-      width="30%">
-      <el-form label-width="100px">
-        <el-form-item label="账号：">
-          <span>18921483103</span>
-        </el-form-item>
-        <el-form-item label="手机号：">
-          <span>18921483103</span>
-        </el-form-item>
-        <el-form-item label="考试科目：">
-          <span>Java</span>
-        </el-form-item>
-        <el-form-item label="考试名称：">
-          <span>Java面向对象</span>
-        </el-form-item>
-        <el-form-item label="考试日期：">
-          <span>2020-03-04</span>
-        </el-form-item>
-        <el-form-item label="考试时长：">
-          <span>120分钟</span>
-        </el-form-item>
-      </el-form>
-      <div>
-        <p>如果您已确认以上信息无误，请点击"开始考试"按钮进入考试；请注意考试纪律，严禁作弊。</p>
-      </div>
-      <div class="start-exam-btn">
-        <el-button type="primary" @click="handleToExaming">开始考试</el-button>
-      </div>
-    </el-dialog>
+    <confirm-dialog :data="confirmData" :visible="dialogVisible" @exam="handleToExaming" @close="handleClose"/>
   </section>
 </template>
 
 <script>
-import { Tabs, TabPane, Input, Dialog, MessageBox, Form, FormItem, Button } from 'element-ui'
+import { Tabs, TabPane, Input, MessageBox, Button, Pagination } from 'element-ui'
 import ListView from '../Paper/ListView'
 import SideMenu from '@/components/SideMenu'
-import { getPapers, getKnowledgePoint } from '../../api/paper'
+import ConfirmDialog from './ConfirmDialog'
+import {
+  getPapers,
+  getKnowledgePointBySingle,
+  getKnowledgePointByMultiple,
+  getKnowledgePointByJudge,
+  getKnowledgePointByCompletion,
+  getKnowledgePointByAFQ
+} from '../../api/paper'
 import { getSubjects } from '../../api/subject'
+import { mapGetters } from 'vuex'
+
 const tabNames = [{
   label: '试卷',
   name: 'paper'
@@ -67,16 +70,38 @@ export default {
   components: {
     Tabs,
     TabPane,
+    Pagination,
     ListView,
     SideMenu,
     ElInput: Input,
-    ElDialog: Dialog,
-    ElForm: Form,
-    ElFormItem: FormItem,
-    ElButton: Button
+    ElButton: Button,
+    ConfirmDialog
   },
   data () {
     return {
+      typeList: [
+        {
+          name: '单选题',
+          _id: '0'
+        },
+        {
+          name: '多选题',
+          _id: '1'
+        },
+        {
+          name: '判断题',
+          _id: '2'
+        },
+        {
+          name: '填空题',
+          _id: '3'
+        },
+        {
+          name: '解答题',
+          _id: '4'
+        }
+      ],
+      confirmData: {},
       dialogVisible: false,
       loading: false,
       tabNames,
@@ -84,17 +109,72 @@ export default {
       listData: [],
       subjectList: [],
       paperList: [],
+      knowledgePointList: [],
       paperName: '',
+      paperType: '',
       id: '',
-      paperId: ''
+      subjectId: '',
+      paperId: '',
+      total: 0,
+      limit: 2,
+      page: 1
     }
+  },
+  computed: {
+    ...mapGetters(['getUsername', 'getPhone'])
   },
   created () {
     this.getSubjects()
   },
   methods: {
-    startTest (id) {
-      this.paperId = id
+    getList (page) {
+      this.page = page
+      if (this.activeName === this.tabNames[0].name) {
+        this.loadData()
+      }
+      if (this.activeName === this.tabNames[1].name) {
+        this.loadDataByType()
+      }
+    },
+    async loadDataByType (id) {
+      this.id = id
+      this.loading = true
+      const params = {
+        limit: this.limit,
+        page: this.page
+      }
+      const funcs = {
+        0: getKnowledgePointBySingle,
+        1: getKnowledgePointByMultiple,
+        2: getKnowledgePointByJudge,
+        3: getKnowledgePointByCompletion,
+        4: getKnowledgePointByAFQ
+      }
+      const res = await funcs[id](params)
+      this.knowledgePointList = res.data.list
+      this.loading = false
+    },
+    handleToTest (knowledgePoint) {
+      this.$router.push({
+        name: 'Test',
+        query: {
+          knowledgePoint,
+          id: this.id
+        }
+      })
+    },
+    handleClose () {
+      this.dialogVisible = false
+    },
+    startTest (item) {
+      this.paperId = item._id
+      this.paperType = item.paperType
+      this.confirmData.username = this.getUsername
+      this.confirmData.phone = this.getPhone
+      this.confirmData.paperName = item.paperName
+      this.confirmData.subject = item.subject.name
+      this.confirmData.startTime = item.startTime
+      this.confirmData.endTime = item.endTime
       MessageBox.confirm(
         '您确定进行模拟考试',
         '模拟考试?',
@@ -105,10 +185,13 @@ export default {
         }
       ).then(() => {
         this.dialogVisible = true
-      })
+      }).catch(() => {})
     },
     handleToExaming () {
-      this.$router.push({ name: 'Examing', params: { _id: this.paperId } })
+      localStorage.setItem('PAPER_ID', this.paperId)
+      localStorage.setItem('PAPER_TYPE', this.paperType)
+      this.$router.push({ name: 'Examing' })
+      this.dialogVisible = false
     },
     /**
        * 搜索
@@ -120,7 +203,7 @@ export default {
        * 根据科目查询信息
        */
     loadData (id) {
-      this.id = id
+      this.subjectId = id
       this.tabData()
     },
     /**
@@ -134,7 +217,8 @@ export default {
         this.getPapers()
       }
       if (this.activeName === this.tabNames[1].name) {
-        this.getKnowledgePoint()
+        // this.getKnowledgePoint()
+        this.loadDataByType('0')
       }
     },
     showPaper (id) {
@@ -151,7 +235,7 @@ export default {
       }
       const res = await getSubjects(params)
       this.subjectList = res.data.list
-      this.id = res.data.list[0]._id
+      this.subjectId = res.data.list[0]._id
       this.getPapers()
     },
     /**
@@ -163,12 +247,13 @@ export default {
         limit: 10,
         page: 1,
         type: 'SIMPLE',
-        subject: this.id
+        subject: this.subjectId
       }
       this.paperName && (params.paperName = this.paperName)
       this.loading = true
       const res = await getPapers(params)
       this.listData = res.data.list
+      this.total = res.data.total
       this.loading = false
     },
     /**
@@ -176,15 +261,15 @@ export default {
        * @returns {Promise<void>}
        */
     async getKnowledgePoint () {
-      const params = {
-        limit: 10,
-        page: 1,
-        _id: this.id
-      }
-      this.loading = true
-      const res = await getKnowledgePoint(params)
-      this.listData = res.data.list
-      this.loading = false
+      // this.loading = true
+      // const params = {
+      //   limit: 10,
+      //   page: 1
+      // }
+      // this.loading = true
+      // const res = await getKnowledgePoint(params)
+      // this.knowledgePointList = res.data.list
+      // this.loading = false
     }
   }
 }
@@ -193,6 +278,7 @@ export default {
 <style lang="scss">
   .paper {
     margin-top: 16px;
+    position: relative;
 
     .gap {
       margin-left: 20px;
@@ -210,8 +296,27 @@ export default {
       width: 100px;
     }
 
-    .start-exam-btn {
-      text-align: center;
+    .list {
+      width: 770px;
+      margin-left: 10px;
+    }
+
+    .knowledge-point-list {
+      margin-bottom: 16px;
+      padding: 16px;
+      border-radius: 6px;
+      border: 1px solid rgba(213, 216, 222, 1);
+    }
+
+    .btn {
+      float: right;
+      margin-top: -10px;
+    }
+
+    .pagination {
+      position: absolute;
+      bottom: 20px;
+      left: 300px;
     }
   }
 </style>

@@ -4,7 +4,7 @@
   @Date: 2020/3/28 11:01 PM
 -->
 <template>
-  <div class="check-box" :class="[checked ? 'checked' : '', !checked && finished ? 'finished' : '']" @click="$emit('check')">{{ value }}</div>
+  <div class="check-box" :class="[checked ? 'checked' : '', !checked && finished ? 'finished' : '']" @click="handleClick">{{ value }}</div>
 </template>
 
 <script>
@@ -22,6 +22,16 @@ export default {
     finished: {
       type: Boolean,
       default: false
+    },
+    prop: {
+      type: String,
+      default: ''
+    }
+  },
+  methods: {
+    handleClick () {
+      this.$emit('check')
+      this.$emit('prop', this.prop)
     }
   }
 }

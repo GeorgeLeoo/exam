@@ -7,7 +7,7 @@
   <div class="count-down">
     <i class="el-icon-alarm-clock icon"/>
     <span class="text">剩余时间</span>
-    <span class="time"><span>{{ hour }}</span>：<span>{{ minute }}</span>：<span>{{ second }}</span></span>
+    <span class="time"><span>{{ hour | timeFilter }}</span>：<span>{{ minute | timeFilter }}</span>：<span>{{ second | timeFilter }}</span></span>
   </div>
 </template>
 
@@ -16,15 +16,71 @@ export default {
   name: 'CountDown',
   props: {
     startTime: {
-      type: Number,
-      default: 0
+      type: String,
+      default: ''
     }
+  },
+  components: {
   },
   data () {
     return {
-      hour: 2,
-      minute: 23,
-      second: 22
+      hour: 0,
+      minute: 0,
+      second: 0
+    }
+  },
+  watch: {
+    startTime () {
+      this.setCountDown()
+    }
+  },
+  mounted () {
+  },
+  methods: {
+    setCountDown () {
+      const times = this.startTime.split(':')
+      this.hour = Number(times[0])
+      this.minute = Number(times[1])
+      this.second = Number(times[2])
+      const timer = setInterval(() => {
+        if (this.hour === 0 && this.minute === 10 && this.second === 0) {
+          this.$notify({
+            title: '警告',
+            message: '还有10分钟考试结束',
+            type: 'warning',
+            offset: 100
+          })
+        }
+        if (this.hour === 0 && this.minute === 2 && this.second === 0) {
+          this.$notify({
+            title: '警告',
+            message: '还有2分钟考试结束',
+            type: 'warning',
+            offset: 100
+          })
+        }
+        if (this.hour === 0 && this.minute === 0 && this.second === 0) {
+          this.hour = 0
+          this.minute = 0
+          this.second = 0
+          clearInterval(timer)
+          this.$emit('time-over')
+          return
+        }
+        if (Number(this.second) === 0) {
+          this.second = 59
+          if (Number(this.minute) !== 0) {
+            this.minute--
+          } else {
+            if (this.hour !== 0) {
+              this.minute = 59
+              this.hour--
+            }
+          }
+        } else {
+          this.second--
+        }
+      }, 1000)
     }
   }
 }
@@ -32,12 +88,13 @@ export default {
 
 <style scoped lang="scss">
   .count-down {
-    width:380px;
-    height:80px;
-    background:rgba(0,0,0,0.1);
-    border-radius:40px;
+    width: 380px;
+    height: 80px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 40px;
     line-height: 80px;
     text-align: center;
+
     .icon {
       font-size: 26px;
     }

@@ -13,3 +13,10 @@ export const register = (data) =>
     method: 'post',
     data
   })
+
+export const getUserInfo = (params) =>
+  request({
+    url: '/user/info',
+    method: 'get',
+    params
+  })

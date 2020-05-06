@@ -7,7 +7,7 @@
   <li class="score-list-item">
     <header>
       <h3 class="paper-name">{{ data.paperName }}</h3>
-      <span class="has-finished">已有<span class="num">{{ data.participantNumber ? data.participantNumber : 0 }}</span>人完成</span>
+      <span class="has-finished">共完成 <span class="num">{{ data.count ? data.count : 0 }}</span> 次</span>
       <div class="tag">
         <el-tag
           v-if="data.paperType === 1"

@@ -17,14 +17,14 @@
         <div class="icon-container">
           <i class="el-icon-bell"/>
         </div>
-        <dropdown>
+        <dropdown @command="handleSelect">
           <span class="el-dropdown-link">
             <avatar class="avatar" shape="square" size="large"
                        src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png"/>
           </span>
           <dropdown-menu slot="dropdown">
-            <dropdown-item>个人中心</dropdown-item>
-            <dropdown-item>退出</dropdown-item>
+            <dropdown-item :command="1">个人中心</dropdown-item>
+            <dropdown-item :command="2">退出</dropdown-item>
           </dropdown-menu>
         </dropdown>
       </div>
@@ -49,6 +49,17 @@ export default {
     menu: {
       type: Array,
       default: () => []
+    }
+  },
+  methods: {
+    handleSelect (index) {
+      if (index === 2) {
+        this.handleLogOut()
+      }
+    },
+    handleLogOut () {
+      this.$store.dispatch('RestToken')
+      this.$router.replace({ path: '/sign-in' })
     }
   }
 }

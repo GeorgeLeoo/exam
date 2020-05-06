@@ -5,7 +5,10 @@
 -->
 <template>
   <ul>
-    <Item v-for="(item, index) in data" :key="index" :data="item" @show-paper="showPaper"/>
+    <p v-if="data.length === 0">暂无数据</p>
+    <template v-else>
+      <Item v-for="(item, index) in data" :key="index" :data="item" @show-paper="showPaper"/>
+    </template>
   </ul>
 </template>
 

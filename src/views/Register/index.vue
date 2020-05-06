@@ -33,11 +33,11 @@
               <p class="hint">请输入正确的邮箱</p>
             </div>
             <div class="login-btn-wrapper">
-              <el-button type="primary">注册</el-button>
+              <el-button type="primary" @click="handleRegister">注册</el-button>
             </div>
             <div class="other">
               <span class="forget">已有账号</span>
-              <el-button type="text">去登录</el-button>
+              <el-button type="text" @click="handleToLogin">去登录</el-button>
             </div>
           </div>
         </div>
@@ -52,6 +52,8 @@
 </template>
 <script>
 import { Button } from 'element-ui'
+import { register } from '../../api/user'
+import uiutils from '../../uiutils'
 export default {
   name: 'Login',
   components: {
@@ -65,7 +67,30 @@ export default {
       email: ''
     }
   },
-  methods: {}
+  methods: {
+    handleToLogin () {
+      this.$router.back()
+    },
+    async handleRegister () {
+      if (!this.username) {
+        uiutils.Message.warning('用户名不能为空')
+        return
+      }
+      if (!this.password) {
+        uiutils.Message.warning('密码不能为空')
+        return
+      }
+      if (!this.email) {
+        uiutils.Message.warning('邮箱不能为空')
+        return
+      }
+      await register({
+        username: this.username,
+        password: this.password,
+        email: this.email
+      })
+    }
+  }
 }
 </script>
 

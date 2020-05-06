@@ -5,16 +5,20 @@
 -->
 <template>
   <div class="examing-head">
-    <h3 class="title"><span class="paper-name">JAVA程序与设计</span><span class="paper-type">（模拟考试）</span><span class="user">20181405478</span><span
-      class="username">苏醒</span></h3>
-    <count-down class="count-down" :start-time="data.startTime" />
-    <div class="camera">camera</div>
+    <h3 class="title">
+      <span class="paper-name">{{ data.paperName }}</span>
+      <span v-if="data.testType === 0" class="paper-type">（模拟考试）</span>
+      <span class="username">{{ data.username }}</span>
+    </h3>
+    <count-down class="count-down" :start-time="data.startTime" @time-over="handleTimeOver"/>
+    <div  v-if="data.testType === 1" class="camera">camera</div>
     <div class="cover"></div>
   </div>
 </template>
 
 <script>
 import CountDown from '@/components/CountDown'
+
 export default {
   name: 'ExamingHead',
   components: {
@@ -24,6 +28,11 @@ export default {
     data: {
       type: Object,
       default: () => {}
+    }
+  },
+  methods: {
+    handleTimeOver () {
+      this.$emit('time-over')
     }
   }
 }
@@ -36,7 +45,8 @@ export default {
     overflow-x: hidden;
     /*background: rgba(64, 158, 255, 1);*/
     color: #fff;
-    .cover{
+
+    .cover {
       position: absolute;
       top: 0;
       left: -100px;
@@ -52,17 +62,19 @@ export default {
       display: inline-block;
       padding-top: 40px;
       padding-left: 100px;
-      .paper-name, .paper-type{
-        font-size:40px;
-        font-weight:600;
+
+      .paper-name, .paper-type {
+        font-size: 40px;
+        font-weight: 600;
       }
-      .user,.username{
-        font-size:20px;
+
+      .user, .username {
+        font-size: 20px;
         margin-left: 32px;
       }
     }
 
-    .camera{
+    .camera {
       float: right;
       width: 136px;
       height: 96px;
@@ -71,7 +83,7 @@ export default {
       background-color: #EBEEF5;
     }
 
-    .count-down{
+    .count-down {
       float: right;
       margin-right: 40px;
       margin-top: 28px;
