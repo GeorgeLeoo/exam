@@ -6,20 +6,22 @@
 <template>
   <li class="score-list-item">
     <header>
-      <h3 class="paper-name">{{ data.paperName }}</h3>
+      <h3 class="paper-name">{{ data.paper && data.paper.paperName }}</h3>
       <el-tag v-if="data.status === 0" type="success">已批改</el-tag>
       <el-tag v-if="data.status === 1" type="danger">未批改</el-tag>
+      <el-tag v-if="data.paper && data.paper.testType === 0" type="error">模拟考试</el-tag>
+      <el-tag v-if="data.paper && data.paper.testType === 1" type="primary">正式考试</el-tag>
     </header>
     <div class="main">
       <div class="time">
         <i class="el-icon-alarm-clock"/>
-        考试时间：<span>{{ data.startTime | parseTime }}</span> - <span>{{ data.endTime | parseTime }}</span>
+        考试时间：<span>{{ data.paper.startTime | parseTime }}</span> - <span>{{ data.paper.endTime | parseTime }}</span>
       </div>
       <div class="time">
-        总分：<span>{{ data.total }}</span>
-        考试时间：<span>{{ data.diffTime }}</span>
+        总分：<span>{{ data.paper | paperTotalScore }}</span>
+        考试时长：<span>{{ data.paper | getDurationTime }}</span>
       </div>
-      <el-button :disabled="data.status === 1" class="btn" type="primary" @click="$emit('show-paper', data._id)">查看试卷</el-button>
+      <el-button :disabled="data.status === 1" class="btn" type="primary" @click="$emit('show-paper', data)">查看试卷</el-button>
     </div>
     <div class="score">
       得分：<span class="score-text">{{ data.score }}</span>
@@ -80,6 +82,9 @@ export default {
     position: absolute;
     right: 0;
     top: 10px;
+  }
+  .el-tag {
+    margin-right: 12px;
   }
 }
 </style>

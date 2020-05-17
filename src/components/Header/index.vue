@@ -15,16 +15,42 @@
       </div>
       <div class="right">
         <div class="icon-container">
-          <i class="el-icon-bell"/>
+          <el-popover
+            placement="bottom"
+            width="800"
+            trigger="click">
+            <div>
+              <el-table :data="notices">
+                <el-table-column property="content" label="内容"></el-table-column>
+                <el-table-column width="200" property="createdAt" label="日期">
+                  <template slot-scope="scope">
+                    <span>{{ scope.row.createdAt | parseTime }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <div style="padding: 16px;text-align: center">
+                <pagination
+                  v-if="total > limit"
+                  :total="total"
+                  :page.sync="page"
+                  :limit.sync="limit"
+                  background
+                  layout="prev, pager, next"
+                  @current-change="handleChangePagination"
+                />
+              </div>
+            </div>
+            <i class="el-icon-bell" slot="reference"/>
+          </el-popover>
         </div>
-        <dropdown>
+        <dropdown @command="handleSelect">
           <span class="el-dropdown-link">
             <avatar class="avatar" shape="square" size="large"
                        src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png"/>
           </span>
           <dropdown-menu slot="dropdown">
-            <dropdown-item>个人中心</dropdown-item>
-            <dropdown-item>退出</dropdown-item>
+            <dropdown-item :command="1">个人中心</dropdown-item>
+            <dropdown-item :command="2">退出</dropdown-item>
           </dropdown-menu>
         </dropdown>
       </div>
@@ -33,8 +59,9 @@
 </template>
 
 <script>
-import { Avatar, Dropdown, DropdownItem, DropdownMenu } from 'element-ui'
+import { Avatar, Dropdown, DropdownItem, DropdownMenu, Popover, Table, TableColumn, Pagination } from 'element-ui'
 import HeaderMenu from '@/components/HeaderMenu'
+import { getNotices } from '../../api/notice'
 
 export default {
   name: 'Header',
@@ -43,12 +70,54 @@ export default {
     Dropdown,
     DropdownItem,
     DropdownMenu,
-    HeaderMenu
+    HeaderMenu,
+    ElPopover: Popover,
+    ElTable: Table,
+    ElTableColumn: TableColumn,
+    Pagination
   },
   props: {
     menu: {
       type: Array,
       default: () => []
+    }
+  },
+  data () {
+    return {
+      notices: [],
+      total: 0,
+      page: 1,
+      limit: 10
+    }
+  },
+  mounted () {
+    this.getNotices()
+  },
+  methods: {
+    handleChangePagination (page) {
+      this.page = page
+      this.getNotices()
+    },
+    async getNotices () {
+      const params = {
+        page: this.page,
+        limit: this.limit
+      }
+      const { data } = await getNotices(params)
+      this.notices = data.list
+      this.total = data.total
+    },
+    handleSelect (index) {
+      if (index === 2) {
+        this.handleLogOut()
+      }
+      if (index === 1) {
+        this.$router.push({ path: '/profile' })
+      }
+    },
+    handleLogOut () {
+      this.$store.dispatch('RestToken')
+      this.$router.replace({ path: '/sign-in' })
     }
   }
 }

@@ -21,7 +21,7 @@ module.exports = {
     progress: false,
     host: 'localhost',
     https: false, // https:{type:Boolean}
-    proxy: 'http://139.159.201.22:3000/mock/14'
+    proxy: process.env.NODE_ENV === 'development' ? 'http://localhost:4500' : 'http://139.159.201.22:4500'
   }
 
 }

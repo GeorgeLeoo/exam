@@ -5,17 +5,30 @@
 -->
 <template>
   <ul class="side-menu" :class="data.length === 0 ? 'height' : ''">
-    <li class="side-menu-item" v-for="(item, index) in data" :key="index" :class="index === key ? 'menu-selected' : ''" @click="handleItemClick(index, item._id)">{{ item.name }}</li>
+    <li class="side-menu-item" v-for="(item, index) in data" :key="index" :class="index === key ? 'menu-selected' : ''" :title="item.name" @click="handleItemClick(index, item._id)">
+      <!--      <el-tooltip v-if="tip" class="item" :content="item.name" placement="right">-->
+      <!--        {{ item.name }}-->
+      <!--      </el-tooltip>-->
+      <span>{{ item.name }}</span>
+    </li>
   </ul>
 </template>
 
 <script>
+import { Tooltip } from 'element-ui'
 export default {
   name: 'SideMenu',
+  components: {
+    ElTooltip: Tooltip
+  },
   props: {
     data: {
       type: Array,
       default: () => []
+    },
+    tip: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -43,6 +56,9 @@ export default {
     padding: 0 16px;
     cursor: pointer;
     text-align: center;
+    overflow: hidden; //超出的文本隐藏
+    text-overflow: ellipsis; //溢出用省略号显示
+    white-space: nowrap; //溢出不换行
     &:hover {
       background: rgba(64,158,255,0.3);
     }

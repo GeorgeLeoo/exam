@@ -7,7 +7,20 @@
   <li class="score-list-item">
     <header>
       <h3 class="paper-name">{{ data.paperName }}</h3>
-      <span class="has-finished">已有<span class="num">{{ data.participantNumber }}</span>人完成</span>
+      <span class="has-finished">共完成 <span class="num">{{ data.count ? data.count : 0 }}</span> 次</span>
+      <div class="tag">
+        <el-tag
+          v-if="data.paperType === 1"
+        >
+          {{ data.paperType | paperTypeFilter }}
+        </el-tag>
+        <el-tag
+          v-if="data.paperType === 0"
+          type="danger"
+        >
+          {{ data.paperType | paperTypeFilter }}
+        </el-tag>
+      </div>
     </header>
     <div class="main">
       <div class="time">
@@ -15,9 +28,9 @@
         考试时间：<span>{{ data.startTime | parseTime }}</span> - <span>{{ data.endTime | parseTime }}</span>
       </div>
       <div class="time">
-        总分：<span>{{ data.total }}</span>
+        总分：<span>{{ data | paperTotalScore }}</span>
         <span class="gap"></span>
-        考试时间：<span>{{ data.durationTime }}</span>
+        考试时长：<span>{{ data | getDurationTime }}</span>
       </div>
       <el-button class="btn" type="primary" @click="$emit('exam', data._id)">开始考试</el-button>
     </div>
@@ -25,11 +38,12 @@
 </template>
 
 <script>
-import { Button } from 'element-ui'
+import { Button, Tag } from 'element-ui'
 export default {
   name: 'Item',
   components: {
-    ElButton: Button
+    ElButton: Button,
+    ElTag: Tag
   },
   props: {
     data: {
@@ -82,6 +96,10 @@ export default {
     .num{
       color: #E02020;
     }
+  }
+  .tag {
+    display: inline-block;
+    margin-left: 24px;
   }
 }
 </style>

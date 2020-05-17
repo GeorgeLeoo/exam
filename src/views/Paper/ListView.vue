@@ -6,10 +6,16 @@
 <template>
   <ul>
     <template v-if="isPaper">
-      <item v-for="(item, index) in data" :key="index" :data="item" @exam="exam"/>
+      <p v-if="data.length === 0">暂无数据</p>
+      <template v-else>
+        <item v-for="(item, index) in data" :key="index" :data="item" @exam="exam(item)"/>
+      </template>
     </template>
     <template v-else>
-      <point-item v-for="(item, index) in data" :key="index" :data="item" @exam="exam"/>
+      <p v-if="data.length === 0">暂无数据</p>
+      <template v-else>
+        <point-item v-for="(item, index) in data" :key="index" :data="item" @exam="exam(item)"/>
+      </template>
     </template>
   </ul>
 </template>
@@ -35,8 +41,8 @@ export default {
     }
   },
   methods: {
-    exam (id) {
-      this.$emit('exam', id)
+    exam (item) {
+      this.$emit('exam', item)
     }
   }
 }

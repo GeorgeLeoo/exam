@@ -11,7 +11,7 @@ export const menuList = [
   },
   {
     icon: 'el-icon-notebook-2',
-    text: '试卷',
+    text: '练习',
     path: '/paper'
   },
   {

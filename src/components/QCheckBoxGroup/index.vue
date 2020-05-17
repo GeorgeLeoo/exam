@@ -5,8 +5,8 @@
 -->
 <template>
   <div>
-    <q-check-box v-for="(item, index) in data" :key="index" :value="item.value" :checked="multiple ? key.includes(index) : index === key"
-                 :label="String.fromCharCode(65 + index)" @select="handleSelected(index)"/>
+    <q-check-box v-for="(item, i) in data" :key="i" :value="item.value" :checked="multiple ? key.includes(i) : i === key"
+                 :label="String.fromCharCode(65 + i)" @select="handleSelected(i)"/>
   </div>
 </template>
 
@@ -26,6 +26,10 @@ export default {
     data: {
       type: Array,
       default: () => []
+    },
+    index: {
+      type: Number,
+      default: 0
     }
   },
   data () {
@@ -33,10 +37,17 @@ export default {
       key: []
     }
   },
-  mounted () {
-    if (!this.multiple) {
-      this.key = -1
+  watch: {
+    data: {
+      handler () {
+        this.key = -1
+        this.key = this.index
+      },
+      deep: true
     }
+  },
+  mounted () {
+    this.key = this.index
   },
   methods: {
     handleSelected (index) {
