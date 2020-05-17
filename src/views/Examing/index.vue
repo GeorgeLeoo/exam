@@ -211,12 +211,13 @@ export default {
   },
   mounted () {
     this.forbid()
-    // this.listeningPage()
+    this.listeningPage()
     this.getPaperQuestion()
   },
   beforeDestroy () {
-    // localStorage.removeItem('PAPER_ID')
+    localStorage.removeItem('PAPER_ID')
     // this.handleSubmitPaper()
+    alert('111')
   },
   methods: {
     async addAnswer () {

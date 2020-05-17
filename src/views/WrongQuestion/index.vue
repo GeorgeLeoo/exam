@@ -8,7 +8,10 @@
     <tabs class="paper-tab" v-model="activeName" @tab-click="handleTabChange">
       <tab-pane v-for="(item, index) in tabNames" :key="index" :label="item.label" :name="item.name"/>
     </tabs>
-    <div>
+    <div v-show="activeName === 'CHARTS'">
+      <div ref="CHARTS" id="CHARTS" style="width: 1024px;height:800px;"></div>
+    </div>
+    <div v-show="activeName !== 'CHARTS'">
       <aside class="fl left">
         <side-menu :data="sideList" :tip="true" @load-data="loadData"/>
       </aside>
@@ -89,7 +92,8 @@
 <script>
 import { Tabs, TabPane, Pagination, Button, Dialog, Input } from 'element-ui'
 import SideMenu from '@/components/SideMenu'
-import { getWrongs, getWrongsByType } from '@/api/wrongs'
+import { getWrongs, getWrongsByType, getWrongListForCharts } from '@/api/wrongs'
+import echarts from 'echarts'
 
 const tabNames = [
   {
@@ -99,6 +103,10 @@ const tabNames = [
   {
     label: '考点',
     name: 'KNOWLEDGE_POINT'
+  },
+  {
+    label: '图表',
+    name: 'CHARTS'
   }
 ]
 
@@ -127,13 +135,53 @@ export default {
       limit: 10,
       total: 0,
       dialogVisible: false,
-      item: {}
+      item: {},
+      wrongCharts: [],
+      xAxisDataDay: [],
+      myChart: '',
+      xAxisData: [],
+      seriesData: [],
+      option: {
+        title: {
+          text: '我的错题考点统计'
+        },
+        xAxis: {
+          data: this.xAxisData
+        },
+        yAxis: {},
+        series: [{
+          data: this.seriesData,
+          type: 'bar'
+        }]
+      }
     }
   },
   created () {
     this.getWrongs()
   },
+  mounted () {
+    this.getWrongCharts()
+  },
   methods: {
+    draw () {
+      const myChart = echarts.init(document.getElementById('CHARTS'))
+      // 绘制图表
+      myChart.setOption({
+        title: {
+          text: '我的错题考点统计'
+        },
+        tooltip: {},
+        xAxis: {
+          data: this.xAxisData
+        },
+        color: ['#409eff'],
+        yAxis: {},
+        series: [{
+          type: 'bar',
+          data: this.seriesData
+        }]
+      })
+    },
     handleSearch () {},
     handleShowWrong (item) {
       this.item = item
@@ -164,9 +212,29 @@ export default {
        * tab按钮改变事件
        */
     handleTabChange () {
-      this.getWrongs()
+      if (this.activeName === 'CHARTS') {
+        // this.getWrongCharts()
+      } else {
+        this.getWrongs()
+      }
+    },
+    async getWrongCharts () {
+      const res = await getWrongListForCharts()
+      this.wrongCharts = res.data.list
+      const x = []
+      const s = []
+      this.wrongCharts.map(item => {
+        x.push(item._id)
+        s.push(item.total)
+      })
+      this.xAxisData = x
+      this.seriesData = s
+      this.draw()
     },
     async getWrongsByType () {
+      if (!this.searchKey) {
+        return
+      }
       this.loading = true
       const params = {
         type: this.activeName,
@@ -195,9 +263,11 @@ export default {
 <style scoped lang="scss">
   .wrong-question {
     margin-top: 16px;
+
     .head {
       height: 60px;
     }
+
     .right {
       width: 780px;
     }
@@ -246,13 +316,15 @@ export default {
     .subject-name {
       line-height: 30px;
     }
+
     .dialog-content {
       line-height: 32px;
       margin-top: -30px;
       word-break: break-word;
-       ul {
-         font-size: 16px;
-       }
+
+      ul {
+        font-size: 16px;
+      }
     }
   }
 </style>

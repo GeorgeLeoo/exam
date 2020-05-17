@@ -2,12 +2,12 @@
   <section class="home wrapper1024">
     <Alert
       class="alert"
-      title="成功提示的文案"
+      :title="notices.content"
       type="success">
     </Alert>
     <article class="clearfix">
-      <HomeLeft class="fl" />
-      <HomeRight class="fl gap" />
+      <HomeLeft class="fl"/>
+      <HomeRight class="fl gap"/>
     </article>
   </section>
 </template>
@@ -16,6 +16,7 @@
 import HomeLeft from './home-left'
 import HomeRight from './home-right'
 import { Alert } from 'element-ui'
+import { getNotices } from '../../api/notice'
 
 export default {
   name: 'Home',
@@ -23,16 +24,36 @@ export default {
     HomeLeft,
     HomeRight,
     Alert
+  },
+  data () {
+    return {
+      notices: {}
+    }
+  },
+  mounted () {
+    this.getNotices()
+  },
+  methods: {
+    async getNotices () {
+      const params = {
+        page: 1,
+        limit: 1
+      }
+      const { data } = await getNotices(params)
+      this.notices = data.list[0]
+    }
   }
 }
 </script>
 <style scoped lang="scss">
-  .home{
+  .home {
     padding-top: 16px;
-    .alert{
+
+    .alert {
       margin-bottom: 16px;
     }
-    .gap{
+
+    .gap {
       margin-left: 16px;
     }
   }

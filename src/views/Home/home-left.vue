@@ -57,15 +57,12 @@
         </ul>
     </div>
     <div class="recent-exam">
-      <h4 class="title">最近考试情况</h4>
+      <h4 class="title">我的考试</h4>
       <ul>
-        <li class="item">
-          <span class="paper-name">java</span>
-          <span class="paper-time">2018-02-10</span>
-        </li>
-        <li class="item">
-          <span class="paper-name">java</span>
-          <span class="paper-time">2018-02-10</span>
+        <li class="item" v-for="(item, index) in scoreData" :key="index">
+          <span class="paper-name">{{ item.paper && item.paper.paperName }}</span>
+          <!--          <span class="paper-score">{{ item.score }}分</span>-->
+          <span class="paper-time">{{ item.paper.createdAt | parseTime }}</span>
         </li>
       </ul>
     </div>
@@ -74,6 +71,7 @@
 
 <script>
 import { Avatar, Progress } from 'element-ui'
+import { getScore } from '../../api/score'
 export default {
   name: 'HomeLeft',
   components: {
@@ -83,7 +81,21 @@ export default {
   data () {
     return {
       signature: '个性签名个性签名个性签名个性签名\n' +
-        '个性签名个性签名个性签名'
+        '个性签名个性签名个性签名',
+      scoreData: []
+    }
+  },
+  mounted () {
+    this.getScore()
+  },
+  methods: {
+    async getScore () {
+      const params = {
+        page: 1,
+        limit: 5
+      }
+      const res = await getScore(params)
+      this.scoreData = res.data.list
     }
   }
 }
@@ -191,6 +203,10 @@ export default {
       }
       .paper-time{
         float: right;
+      }
+      .paper-score {
+        color: #E02020;
+        padding-left: 12px;
       }
     }
 

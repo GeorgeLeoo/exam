@@ -24,3 +24,9 @@ export const getWrongsByType = (params) =>
     method: 'get',
     params
   })
+
+export const getWrongListForCharts = () =>
+  request({
+    url: '/wrongs/list',
+    method: 'get'
+  })

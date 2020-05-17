@@ -137,3 +137,9 @@ export const getAFQs = (params) =>
     method: 'get',
     params
   })
+
+export const getHotPapers = () =>
+  request({
+    url: '/papers/hots',
+    method: 'get'
+  })
