@@ -3,7 +3,7 @@
     <div class="user-info clearfix">
       <div class="fl">
         <Avatar class="avatar" shape="square" size="large"
-                   src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png"/>
+                   src="https://dss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1305353222,2352820043&fm=26&gp=0.jpg"/>
       </div>
       <div class="fl gap">
         <h4 class="nickname">苏醒</h4>

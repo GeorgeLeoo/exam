@@ -34,22 +34,27 @@
         class="paper-dialog-list paper-question"
       >
         <Single
+          :is-show="false"
           :data="answer.answer ? answer.answer.single : ''"
           :score="answer.paper ? answer.paper.singleScore : ''"
         />
         <Multiple
+          :is-show="false"
           :data="answer.answer ? answer.answer.multiple : ''"
           :score="answer.answer ? answer.answer.multipleScore : ''"
         />
         <Judge
+          :is-show="false"
           :data="answer.answer ? answer.answer.judge : ''"
           :score="answer.answer ? answer.answer.judgeScore : ''"
         />
         <Completion
+          :is-show="false"
           :data="answer.answer ? answer.answer.completion : ''"
           :score="answer.answer ? answer.answer.completionScore : ''"
         />
         <AFQ
+          :is-show="false"
           :data="answer.answer ? answer.answer.afq : ''"
           :score="answer.answer ? answer.answer.afqScore : ''"
         />

@@ -14,7 +14,7 @@
       <dt class="question-list-item-title">
         {{ index + 1 }}. {{ item.original.question }}
       </dt>
-      <dd>
+      <dd v-if="isShow">
         <el-button :disabled="!item.ican" type="danger" size="mini" @click="handleShowAnswer(item)">我不会</el-button>
       </dd>
       <template v-if="!isTest">
@@ -59,6 +59,10 @@ export default {
     score: {
       type: Number,
       default: 0
+    },
+    isShow: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
