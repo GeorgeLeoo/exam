@@ -14,7 +14,7 @@
       <h3 class="label">个性签名：</h3>
       <p class="text">{{ signature }}</p>
     </div>
-    <div class="stat">
+    <!-- <div class="stat">
       <div class="row">
         <div class="item">
           <span class="num">20</span>
@@ -55,7 +55,7 @@
             <el-progress :text-inside="true" :stroke-width="16" :percentage="40"></el-progress>
           </li>
         </ul>
-    </div>
+    </div> -->
     <div class="recent-exam">
       <h4 class="title">我的考试</h4>
       <ul>
@@ -80,8 +80,7 @@ export default {
   },
   data () {
     return {
-      signature: '个性签名个性签名个性签名个性签名\n' +
-        '个性签名个性签名个性签名',
+      signature: '学习使我快乐',
       scoreData: []
     }
   },
