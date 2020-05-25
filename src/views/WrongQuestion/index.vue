@@ -157,9 +157,9 @@ export default {
     }
   },
   created () {
-    this.getWrongs()
   },
   mounted () {
+    this.getWrongs()
     this.getWrongCharts()
   },
   methods: {
@@ -198,7 +198,9 @@ export default {
       this.isLoading = true
       const params = {
         type: this.activeName,
-        searchKey: this.searchKey
+        searchKey: this.searchKey ? this.searchKey : '前端',
+        limit: this.limit,
+        page: this.page
       }
       const { data } = await getWrongs(params)
       this.sideList = data.map(item => {
@@ -206,6 +208,7 @@ export default {
         return item
       })
       this.searchKey = data[0]._id
+      this.isLoading = false
       this.getWrongsByType()
     },
     /**
@@ -218,9 +221,39 @@ export default {
         this.getWrongs()
       }
     },
+    /**
+     * 将对象转换为数组
+     */
+    splitObjToArray (obj) {
+      const arr = []
+      const keys = Object.keys(obj)
+      for (const key of keys) {
+        arr.push({
+          _id: key,
+          total: obj[key]
+        })
+      }
+      return arr
+    },
+    /**
+     * 将列表转化为想要的格式
+     */
+    setWrongListForCharts (data) {
+      const obj = {}
+      for (const item of data) {
+        obj[item.knowledgePoint] = 0
+      }
+      for (const item of data) {
+        const count = obj[item.knowledgePoint]
+        const num = count + item.count
+        obj[item.knowledgePoint] = num
+      }
+      return this.splitObjToArray(obj)
+    },
     async getWrongCharts () {
-      const res = await getWrongListForCharts()
-      this.wrongCharts = res.data.list
+      const res = await getWrongListForCharts({})
+      this.wrongCharts = this.setWrongListForCharts(res.data)
+      // this.wrongCharts = (res.data.list)
       const x = []
       const s = []
       this.wrongCharts.map(item => {
@@ -232,6 +265,7 @@ export default {
       this.draw()
     },
     async getWrongsByType () {
+      this.isLoading = true
       if (!this.searchKey) {
         return
       }

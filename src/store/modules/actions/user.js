@@ -10,6 +10,9 @@ import {
 } from './../mutation-types'
 import { setToken, setUid, getUid } from '@/utils/cookies'
 import { login, getUserInfo } from '../../../api/user'
+import uiutils from '@/uiutils'
+import store from '@/store'
+import router from '@/router'
 
 export default {
   async Login ({ commit }, userInfo) {
@@ -26,10 +29,13 @@ export default {
   },
   async GetUserInfo ({ commit }) {
     const uid = getUid()
-    if (uid === '') {
-      throw Error('GetUserInfo: uid is undefined!')
+    if (!uid) {
+      // throw Error('GetUserInfo: uid is undefined!')
+      uiutils.Message.error('您还未登录')
+      store.dispatch('RestToken')
+      router.replace({ path: '/sign-in' })
     }
-    const { data } = await getUserInfo({ uid: uid })
+    const { data } = await getUserInfo({ uid })
     if (!data) {
       throw Error('Verification failed, please Login again.')
     }
