@@ -43,16 +43,25 @@
       <!--        </el-input>-->
       </el-form-item>
     </el-form>
+    <tabs @tab="handleTab">
+      <tab title="tab1" name="1">1</tab>
+      <tab title="tab2" name="2">2</tab>
+      <tab title="tab3" name="3">3</tab>
+    </tabs>
   </div>
 </template>
 <script>
 import { Upload, Form, FormItem } from 'element-ui'
+import Tab from './components/Tab'
+import Tabs from './components/Tabs'
 export default {
   name: 'Profile',
   components: {
     ElUpload: Upload,
     ElForm: Form,
-    ElFormItem: FormItem
+    ElFormItem: FormItem,
+    Tab,
+    Tabs
   },
   data () {
     return {
@@ -60,6 +69,9 @@ export default {
     }
   },
   methods: {
+    handleTab (i) {
+      console.log(i)
+    },
     handleAvatarSuccess (res) {
       this.$set(this.data, 'picture', res.data)
     },

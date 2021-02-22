@@ -7,7 +7,7 @@
   <div class="login">
     <header class="logo">
       <img class="logo-img" src="./../../assets/logo.png" alt="">
-      <span class="logo-text">考试通</span>
+      <span class="logo-text">智能考试系统</span>
     </header>
     <section class="login-wrapper">
       <article class="login-content">
@@ -38,7 +38,7 @@
         </div>
         <article class="login-footer">
           <img src="./../../assets/login-line-right.png" alt="">
-          <span>考试通·完美的在线考试系统</span>
+          <span>智能考试系统·完美的在线考试系统</span>
           <img src="./../../assets/login-line-left.png" alt="">
         </article>
       </article>

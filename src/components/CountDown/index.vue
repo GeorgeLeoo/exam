@@ -15,6 +15,9 @@
 export default {
   name: 'CountDown',
   props: {
+    /**
+     * 开始时间
+     */
     startTime: {
       type: String,
       default: ''

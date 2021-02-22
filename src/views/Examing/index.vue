@@ -247,12 +247,12 @@ export default {
       }
       await addAnswer(data)
       this.loadingText = '交卷成功，3s后将返回首页'
-      setTimeout(() => {
-        this.loadingPaper = false
-        this.loadingText = '正在生成试卷中'
-        localStorage.removeItem('PAPER_ID')
-        this.$router.back()
-      }, 3000)
+      // setTimeout(() => {
+      // }, 3000)
+      this.loadingPaper = false
+      this.loadingText = '正在生成试卷中'
+      localStorage.removeItem('PAPER_ID')
+      this.$router.back()
     },
     handleMultipleSelected (keys) {
       console.log(keys)
